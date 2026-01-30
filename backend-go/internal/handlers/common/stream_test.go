@@ -319,4 +319,14 @@ func TestPatchTokensInEventWithCache(t *testing.T) {
 			t.Errorf("expected cache_read_input_tokens=0, got %v", got)
 		}
 	})
+
+	t.Run("should not overwrite explicit zero from upstream", func(t *testing.T) {
+		// 上游显式返回 cache_read_input_tokens: 0 表示"明确无缓存"，不应被推断值覆盖
+		event := "event: message_delta\ndata: {\"type\":\"message_delta\",\"usage\":{\"input_tokens\":20000,\"output_tokens\":100,\"cache_read_input_tokens\":0}}\n\n"
+		patched := PatchTokensInEventWithCache(event, 20000, 100, 80000, true, false, false)
+		got := extractCacheRead(t, patched)
+		if got != 0 {
+			t.Errorf("expected cache_read_input_tokens=0 (explicit zero preserved), got %v", got)
+		}
+	})
 }

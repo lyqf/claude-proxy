@@ -722,9 +722,9 @@ func PatchTokensInEventWithCache(event string, estimatedInputTokens, estimatedOu
 		// 修补顶层 usage
 		if usage, ok := data["usage"].(map[string]interface{}); ok {
 			patchUsageFieldsWithLog(usage, estimatedInputTokens, estimatedOutputTokens, hasCacheTokens, enableLog, "顶层usage", lowQuality)
-			// 写入推断的 cache_read_input_tokens
+			// 写入推断的 cache_read_input_tokens（仅当字段不存在时）
 			if inferredCacheRead > 0 {
-				if existingCacheRead, ok := usage["cache_read_input_tokens"].(float64); !ok || existingCacheRead == 0 {
+				if _, exists := usage["cache_read_input_tokens"]; !exists {
 					usage["cache_read_input_tokens"] = inferredCacheRead
 					if enableLog {
 						log.Printf("[Messages-Stream-Token] 顶层usage: 写入推断的 cache_read_input_tokens=%d", inferredCacheRead)
@@ -737,9 +737,9 @@ func PatchTokensInEventWithCache(event string, estimatedInputTokens, estimatedOu
 		if msg, ok := data["message"].(map[string]interface{}); ok {
 			if usage, ok := msg["usage"].(map[string]interface{}); ok {
 				patchUsageFieldsWithLog(usage, estimatedInputTokens, estimatedOutputTokens, hasCacheTokens, enableLog, "message.usage", lowQuality)
-				// 写入推断的 cache_read_input_tokens
+				// 写入推断的 cache_read_input_tokens（仅当字段不存在时）
 				if inferredCacheRead > 0 {
-					if existingCacheRead, ok := usage["cache_read_input_tokens"].(float64); !ok || existingCacheRead == 0 {
+					if _, exists := usage["cache_read_input_tokens"]; !exists {
 						usage["cache_read_input_tokens"] = inferredCacheRead
 						if enableLog {
 							log.Printf("[Messages-Stream-Token] message.usage: 写入推断的 cache_read_input_tokens=%d", inferredCacheRead)

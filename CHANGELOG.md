@@ -21,9 +21,10 @@
     - 使用 `originalUsageData` 传递给 `PatchMessageStartInputTokensIfNeeded`，避免误判
     - Token 修补逻辑增加隐式缓存信号检测，避免覆盖缓存命中场景下的正确低值
     - 隐式缓存推断在转发前执行，确保下游客户端能收到推断值
+    - 仅当上游事件中不存在 `cache_read_input_tokens` 字段时才写入推断值，避免覆盖上游显式返回的 0 值
   - 涉及文件：
     - `backend-go/internal/handlers/common/stream.go` - 核心逻辑实现
-    - `backend-go/internal/handlers/common/stream_test.go` - 单元测试（14 个边界场景）
+    - `backend-go/internal/handlers/common/stream_test.go` - 单元测试（15 个边界场景）
 
 ---
 
